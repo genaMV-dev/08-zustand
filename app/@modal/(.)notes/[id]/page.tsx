@@ -1,4 +1,4 @@
-import NotePreview from "@/app/@preview/NotePreview/NotePreview"
+import NotePreview from "@/app/@modal/NotePreview/NotePreview.client"
 import { getNoteItem } from "@/lib/api"
 
 interface Props {
