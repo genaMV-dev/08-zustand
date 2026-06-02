@@ -1,0 +1,29 @@
+.wrapper {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 134px);
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: #2f2f2f;
+  padding: 24px 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 12px 0;
+  }
+}
