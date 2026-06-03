@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query"
 import Notes from "../../Notes.client"
 import type { NoteTag } from "@/types/note"
-import SidebarNotes from "../@sidebar/SidebarNotes/SidebarNotes"
+
 
 type Props = {
   params: Promise<{
