@@ -18,6 +18,12 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
   const { draft, setDraft, clear } = useDraftStore()
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (newNote: NewNoteBody) => createNote(newNote),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [`notes`] })
+      clear()
+      router.push(`/notes/filter/all`)
+      onClose?.()
+    },
   })
 
   const handleChange = (
@@ -37,10 +43,6 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
     }
 
     await mutateAsync(newNote)
-    await queryClient.invalidateQueries({ queryKey: [`notes`] })
-    clear()
-    router.push(`/notes/filter/all`)
-    onClose?.()
   }
 
   const handleCancel = () => {
