@@ -1,7 +1,8 @@
 "use client"
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import css from "./NoteForm.module.css"
+import { useRouter } from "next/navigation"
 import { createNote } from "@/lib/api"
 import { NewNoteBody } from "@/types/note"
 import { useDraftStore } from "@/lib/store/noteStore"
@@ -12,6 +13,8 @@ interface NoteFormProps {
 }
 
 const NoteForm = ({ onClose }: NoteFormProps) => {
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const { draft, setDraft, clear } = useDraftStore()
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (newNote: NewNoteBody) => createNote(newNote),
@@ -34,7 +37,15 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
     }
 
     await mutateAsync(newNote)
+    await queryClient.invalidateQueries({ queryKey: [`notes`] })
     clear()
+    router.push(`/notes/filter/all`)
+    onClose?.()
+  }
+
+  const handleCancel = () => {
+    clear()
+    router.back()
     onClose?.()
   }
 
@@ -89,10 +100,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
           type="button"
           className={css.cancelButton}
           disabled={isPending}
-          onClick={() => {
-            clear()
-            onClose?.()
-          }}
+          onClick={handleCancel}
         >
           Cancel
         </button>
