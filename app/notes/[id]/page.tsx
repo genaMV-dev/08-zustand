@@ -21,11 +21,11 @@ export const generateMetadata = async ({
     title: note.title,
     description: note.content,
     openGraph: {
-        title: note.title,
-        description: note.content,
-        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
-        images: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
-      },
+      title: note.title,
+      description: note.content,
+      url: "https://08-zustand-bice-phi.vercel.app/",
+      images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"],
+    },
   }
 }
 

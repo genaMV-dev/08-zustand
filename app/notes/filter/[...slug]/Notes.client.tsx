@@ -1,88 +1,106 @@
 "use client"
 
-import { getNotes, NoteApiResponse } from "@/lib/api"
-import { useQuery } from "@tanstack/react-query"
-import React, { useEffect, useRef, useState } from "react"
-import { useDebouncedCallback } from "use-debounce"
-import css from "./Notes.module.css"
-import type { NoteTag } from "@/types/note"
-import SearchBox from "@/components/SearchBox/SearchBox"
-import Pagination from "@/components/Pagination/Pagination"
-import NoteList from "@/components/NoteList/NoteList"
-import Modal from "@/components/Modal/Modal"
-import NoteForm from "@/components/NoteForm/NoteForm"
-import Link from "next/link"
+import { useMutation } from "@tanstack/react-query"
+import css from "./CreateForm.module.css"
+import { useRouter } from "next/navigation"
+import { createNote } from "@/lib/api"
+import { NewNoteBody, NoteTag } from "@/types/note"
+import { useDraftStore } from "@/lib/store/noteStore"
+import { ChangeEvent } from "react"
 
-interface NotesProps {
-  tag?: NoteTag
-}
 
-const Notes = ({ tag }: NotesProps) => {
-  const [page, setPage] = useState(1)
-  const [isOpen, setIsOpen] = useState(false)
-  const [inputValue, setInputValue] = useState("")
-  const [searchQuery, setSearchQuery] = useState(``)
+const CreateFormClient = () => {
+  const router = useRouter()
 
-  const prevDataRef = useRef<NoteApiResponse | null>(null)
+  
+  const { draft, setDraft, clear } = useDraftStore()
 
-  const debouncedSetSearchQuery = useDebouncedCallback((value: string) => {
-    setSearchQuery(value)
-    setPage(1)
-  }, 300)
-
-  const handleSearchChange = (value: string) => {
-    setInputValue(value)
-    debouncedSetSearchQuery(value)
-  }
-
-  const { data } = useQuery<NoteApiResponse, Error>({
-    queryKey: [`notes`, page, searchQuery, tag],
-    queryFn: () =>
-      getNotes({ page, perPage: 10, searchQuery, tag }),
-    placeholderData: () => prevDataRef.current ?? { notes: [], totalPages: 0 },
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: (newNote: NewNoteBody) => createNote(newNote),
   })
 
-  useEffect(() => {
-    if (data) {
-      prevDataRef.current = data
-    }
-  }, [data])
-
-  const displayData: NoteApiResponse = data ?? { notes: [], totalPages: 0 }
-
-  const onChangePage = (page: number) => {
-    setPage(page)
+  const handleCancel = () => {
+    router.back()
   }
 
-  const onClose = () => {
-    setIsOpen(false)
+  const handleSubmit = async (formData: FormData) => {
+    const title = formData.get("title")?.toString() ?? ""
+    const content = formData.get("content")?.toString() ?? ""
+    const tag = formData.get("tag") as NoteTag
+
+    const newNote: NewNoteBody = { title, content, tag }
+    console.log(tag)
+
+    await mutateAsync(newNote)
+    clear()
+    router.push(`/notes/filter/all`)
   }
 
-  const onOpen = () => {
-    setIsOpen(true)
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
+    setDraft({ ...draft, [e.target.name]: e.target.value }) 
   }
 
   return (
-    <div className={css.app}>
-      <header className={css.toolbar}>
-        <SearchBox value={inputValue} onChange={handleSearchChange} />
-        {displayData && displayData.totalPages > 1 && (
-          <Pagination
-            currentPage={page}
-            totalPages={displayData.totalPages}
-            onPageChange={onChangePage}
+    <div>
+      <form action={handleSubmit} className={css.form}>
+        <div className={css.formGroup}>
+          <label htmlFor="title">Title</label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            className={css.input}
+            defaultValue={draft.title}
+            onChange={handleChange}
           />
-        )}
-          <Link className={css.button} href="/notes/actions/create">Create note +</Link>
-      </header>
-      <NoteList notes={displayData?.notes ?? []} />
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <NoteForm onClose={onClose} />
-        </Modal>
-      )}
+        </div>
+
+        <div className={css.formGroup}>
+          <label htmlFor="content">Content</label>
+          <textarea
+            id="content"
+            name="content"
+            rows={8}
+            className={css.textarea}
+            defaultValue={draft.content}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className={css.formGroup}>
+          <label htmlFor="tag">Tag</label>
+          <select
+            id="tag"
+            name="tag"
+            className={css.select}
+            defaultValue={draft.tag}
+            onChange={handleChange}
+          >
+            <option value="Todo">Todo</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Meeting">Meeting</option>
+            <option value="Shopping">Shopping</option>
+          </select>
+        </div>
+
+        <div className={css.actions}>
+          <button disabled={isPending} className={css.submitButton}>
+            {isPending ? `Creating...` : `Create note`}
+          </button>
+          <button
+            disabled={isPending}
+            type="button"
+            onClick={handleCancel}
+            className={css.cancelButton}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
-
-export default Notes
+export default CreateFormClient

@@ -7,15 +7,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Create new Note",
     description: "Page for creating new note",
-    url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
-    images: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"
-  }
+    url: "https://08-zustand-bice-phi.vercel.app/",
+    images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"],
+  },
 }
 
 const CreatePage = () => {
   return (
     <div>
-      <CreateFormClient/>
+      <CreateFormClient />
     </div>
   )
 }
