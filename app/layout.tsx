@@ -19,7 +19,7 @@ const fontRoboto = Roboto({
   weight: ["400", "600"],
   subsets: ["latin"],
   display: "auto",
-  variable: "--font-roboto"
+  variable: "--font-roboto",
 })
 
 export const metadata: Metadata = {
@@ -29,16 +29,16 @@ export const metadata: Metadata = {
     title: "NoteHub",
     description: "Note management app",
     url: "https://08-zustand-bice-phi.vercel.app/",
-    images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"]
-  }
+    images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"],
+  },
 }
 
 export default function RootLayout({
   children,
-  modal
+  modal,
 }: Readonly<{
-  children: React.ReactNode,
-  modal?: React.ReactNode
+  children: React.ReactNode
+  modal: React.ReactNode
 }>) {
   return (
     <html lang="en" className={`${fontRoboto.variable}`}>
