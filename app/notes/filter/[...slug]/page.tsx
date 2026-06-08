@@ -6,12 +6,41 @@ import {
 } from "@tanstack/react-query"
 import Notes from "./Notes.client"
 import type { NoteTag } from "@/types/note"
-
+import { Metadata } from "next"
 
 type Props = {
   params: Promise<{
     slug: string[]
   }>
+}
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { slug } = await params
+  const tag = slug[0] === "all" ? undefined : (slug[0] as NoteTag)
+  if (slug[0] === "all") {
+    return {
+      title: `All`,
+      description: `All notes`,
+      openGraph: {
+        title: "All",
+        description: "All notes",
+        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+        images: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+      },
+    }
+  }
+  return {
+    title: tag,
+    description: `You choose tag: ${tag}`,
+    openGraph: {
+      title: tag,
+      description: `You choose tag: ${tag}`,
+      url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+      images: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+    },
+  }
 }
 
 const NotesFilterPage = async ({ params }: Props) => {

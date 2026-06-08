@@ -11,6 +11,7 @@ import Pagination from "@/components/Pagination/Pagination"
 import NoteList from "@/components/NoteList/NoteList"
 import Modal from "@/components/Modal/Modal"
 import NoteForm from "@/components/NoteForm/NoteForm"
+import Link from "next/link"
 
 interface NotesProps {
   tag?: NoteTag
@@ -72,9 +73,7 @@ const Notes = ({ tag }: NotesProps) => {
             onPageChange={onChangePage}
           />
         )}
-        <button className={css.button} onClick={onOpen}>
-          Create note +
-        </button>
+          <Link className={css.button} href="/notes/actions/create">Create note +</Link>
       </header>
       <NoteList notes={displayData?.notes ?? []} />
       {isOpen && (
